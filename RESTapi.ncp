@@ -1,0 +1,239 @@
+<Project>
+  <Name>RESTapi</Name>
+  <ProjectItem type="NClass.DiagramEditor.ClassDiagram.Diagram" assembly="NClass.DiagramEditor, Version=2.4.1823.0, Culture=neutral, PublicKeyToken=null">
+    <Name>Base</Name>
+    <Language>CSharp</Language>
+    <Entities>
+      <Entity type="Class">
+        <Name>Server</Name>
+        <Access>Public</Access>
+        <Location left="114" top="38" />
+        <Size width="211" height="216" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private List&lt;HttpListener&gt; m_Listener</Member>
+        <Member type="Property">public Dictionary&lt;string, PluginBase&gt; Plugins { get; }</Member>
+        <Member type="Property">public ILog Log { get; }</Member>
+        <Member type="Constructor">public Server()</Member>
+        <Member type="Method">public void Start()</Member>
+        <Member type="Method">public void Stop()</Member>
+        <Member type="Method">private void HandleRequest()</Member>
+        <Member type="Property">public ListResource Resources { get; }</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>Resource</Name>
+        <Access>Public</Access>
+        <Location left="366" top="303" />
+        <Size width="162" height="216" />
+        <Collapsed>False</Collapsed>
+        <Member type="Method">public abstract void WriteResource(HttpListenerContext context)</Member>
+        <Modifier>Abstract</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>ListResource</Name>
+        <Access>Public</Access>
+        <Location left="366" top="596" />
+        <Size width="162" height="216" />
+        <Collapsed>False</Collapsed>
+        <Member type="Property">public Dictionary&lt;string, Resource&gt; SubResources { get; }</Member>
+        <Member type="Method">public override void WriteResource(HttpListenerContext context)</Member>
+        <Member type="Method">public void Forward(URI uri)</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>URI</Name>
+        <Access>Public</Access>
+        <Location left="629" top="303" />
+        <Size width="162" height="216" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private string[] m_Sections</Member>
+        <Member type="Field">private int m_CurrentSection</Member>
+        <Member type="Method">public string GetSection()</Member>
+        <Member type="Method">public void Next()</Member>
+        <Member type="Method">public void Reset()</Member>
+        <Member type="Constructor">public URI(string uri)</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>ResourceAttributeCollection</Name>
+        <Access>Public</Access>
+        <Location left="130" top="303" />
+        <Size width="162" height="216" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">Dictionary&lt;string,object&gt; m_Attributes</Member>
+        <Member type="Property">public object this[string id] { get; }</Member>
+        <Member type="Method">private void AddAttribute(string id, object item)</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Interface">
+        <Name>IResourceAttributeCollection</Name>
+        <Access>Default</Access>
+        <Location left="130" top="596" />
+        <Size width="162" height="216" />
+        <Collapsed>False</Collapsed>
+        <Member type="Property">object this[string id] { get; }</Member>
+      </Entity>
+      <Entity type="Class">
+        <Name>PluginBase</Name>
+        <Access>Public</Access>
+        <Location left="629" top="38" />
+        <Size width="162" height="216" />
+        <Collapsed>False</Collapsed>
+        <Modifier>Abstract</Modifier>
+      </Entity>
+      <Entity type="Interface">
+        <Name>IDataBaseWorker</Name>
+        <Access>Public</Access>
+        <Location left="657" top="596" />
+        <Size width="162" height="216" />
+        <Collapsed>False</Collapsed>
+        <Member type="Method">void QueueQuerry(DataBaseQuerry querry, QuerryDoneCallBack callBack)</Member>
+      </Entity>
+      <Entity type="Class">
+        <Name>DataBaseQuerry</Name>
+        <Access>Public</Access>
+        <Location left="890" top="596" />
+        <Size width="162" height="216" />
+        <Collapsed>False</Collapsed>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Delegate">
+        <Name>QuerryDoneCallBack</Name>
+        <Access>Public</Access>
+        <Location left="890" top="303" />
+        <Size width="162" height="216" />
+        <Collapsed>False</Collapsed>
+        <ReturnType>void</ReturnType>
+        <Param>QuerryResult result</Param>
+      </Entity>
+      <Entity type="Class">
+        <Name>QuerryResult</Name>
+        <Access>Public</Access>
+        <Location left="1114" top="303" />
+        <Size width="162" height="216" />
+        <Collapsed>False</Collapsed>
+        <Member type="Property">public DataBaseQuerry Querry { get; }</Member>
+        <Member type="Property">public QuerryState State { get; }</Member>
+        <Member type="Constructor">public QuerryResult(DataBaseQuerry querry, QuerrySate state)</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Enum">
+        <Name>QuerryState</Name>
+        <Access>Public</Access>
+        <Location left="1114" top="596" />
+        <Size width="162" height="216" />
+        <Collapsed>False</Collapsed>
+        <Value>SUCSSEED</Value>
+        <Value>ABORTED</Value>
+      </Entity>
+      <Entity type="Class">
+        <Name>RequestHandler</Name>
+        <Access>Public</Access>
+        <Location left="890" top="38" />
+        <Size width="162" height="216" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">Server m_Server</Member>
+        <Member type="Field">List&lt;Thread&gt; m_Threads</Member>
+        <Member type="Method">public void HandleRequest(HttpListenerContext context)</Member>
+        <Member type="Constructor">public RequestHandler(Server server)</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+    </Entities>
+    <Relationships>
+      <Relationship type="Generalization" first="2" second="1">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+      </Relationship>
+      <Relationship type="Nesting" first="1" second="4">
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+      </Relationship>
+      <Relationship type="Nesting" first="1" second="5">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+      </Relationship>
+      <Relationship type="Realization" first="4" second="5">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+      </Relationship>
+      <Relationship type="Association" first="0" second="1">
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartMultiplicity>1</StartMultiplicity>
+        <EndMultiplicity>*</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="0" second="6">
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+        <StartMultiplicity>1</StartMultiplicity>
+        <EndMultiplicity>*</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Nesting" first="10" second="11">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>1188</X>
+          <Y>549</Y>
+        </BendPoint>
+        <BendPoint relativeToStartShape="False">
+          <X>1188</X>
+          <Y>558</Y>
+        </BendPoint>
+      </Relationship>
+      <Relationship type="Association" first="10" second="11">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>1227</X>
+          <Y>547</Y>
+        </BendPoint>
+        <BendPoint relativeToStartShape="False">
+          <X>1227</X>
+          <Y>568</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Composition</AssociationType>
+        <StartMultiplicity>1</StartMultiplicity>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="10" second="8">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>1148</X>
+          <Y>544</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Composition</AssociationType>
+        <StartMultiplicity>1</StartMultiplicity>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="0" second="7">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Aggregation</AssociationType>
+        <StartMultiplicity>0..*</StartMultiplicity>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+      <Relationship type="Association" first="0" second="12">
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Composition</AssociationType>
+        <StartMultiplicity>1</StartMultiplicity>
+        <EndMultiplicity>1</EndMultiplicity>
+      </Relationship>
+    </Relationships>
+  </ProjectItem>
+  <ProjectItem type="NClass.DiagramEditor.ClassDiagram.Diagram" assembly="NClass.DiagramEditor, Version=2.4.1823.0, Culture=neutral, PublicKeyToken=null">
+    <Name>PicturePlugin</Name>
+    <Language>CSharp</Language>
+    <Entities />
+    <Relationships />
+  </ProjectItem>
+</Project>
