@@ -8,35 +8,38 @@ namespace REST_Server
 {
 	public abstract class Resource : IResource
 	{
-		private string m_Name;
-		
-		public string Name {
-			get {
-				return m_Name;
-			}
-		}
+        public abstract void Pull(URI uri, HttpListenerContext context);
 
-		public Resource(string name)
-		{
-			m_Name = name;
-		}
+        private string m_Name;
 
-		public abstract void WriteResource (HttpListenerContext context);
+        public Resource(string name)
+        {
+            m_Name = name;
+        }
 
 		#region static
 
-		protected static void WriteOut(HttpListenerContext context, string inString)
-		{
-			byte[] buffer = context.Response.ContentEncoding.GetBytes (inString);
-			context.Response.OutputStream.Write (buffer, 0, buffer.Length);
-		}
+        protected static void WriteOut(HttpListenerContext context, string inString)
+        {
+            byte[] buffer = context.Response.ContentEncoding.GetBytes(inString);
+            context.Response.OutputStream.Write(buffer, 0, buffer.Length);
+        }
 
 		#endregion
-	}
+
+        public string Name
+        {
+            get 
+            {
+                return m_Name;
+            }
+        }
+    }
 
 	public interface IResource
 	{
-		void WriteResource (HttpListenerContext context);
+        string Name { get; }
+		void Pull (URI uri, HttpListenerContext context);
 	}
 }
 

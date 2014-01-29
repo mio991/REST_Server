@@ -4,6 +4,8 @@ namespace REST_Server
 {
 	public class RESTProcessException : Exception
 	{
+        public static readonly RESTProcessException ResorceNotFound = new RESTProcessException("Resouce Not Found", 404);
+
 		private int m_ErrorCode;
 
 		public int ErrorCode

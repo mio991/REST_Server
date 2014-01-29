@@ -29,11 +29,7 @@ namespace REST_Server
 					m_Server.Log.Info (String.Format ("Begin Handle Request from {0} for {1}", context.Request.RemoteEndPoint, context.Request.RawUrl));
 					context.Response.ContentEncoding = m_Encoding;
 					URI uri = new URI (context.Request.RawUrl);
-					if (!uri.IsEnded) {
-						m_Server.RootResource.Forward (uri, context);
-					} else {
-						m_Server.RootResource.WriteResource (context);
-					}
+				    m_Server.RootResource.Pull (uri, context);
 				} catch (RESTProcessException ex) {
 					m_Server.Log.Error (ex);
 					context.Response.StatusCode = ex.ErrorCode;

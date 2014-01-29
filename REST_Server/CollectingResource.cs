@@ -6,47 +6,46 @@ using System.Collections;
 
 namespace REST_Server
 {
-	public class CollectingResource : Resource, ICollectingResource
+	public class CollectingResource : Resource
 	{
 		private Dictionary<string, Resource> m_Childs = new Dictionary<string, Resource>();
 		private Server m_Server;
 
-		public CollectingResource (Server server, string name) : base (name){
+		public CollectingResource (Server server, string name) : base(name){
 			m_Server = server;
 		}
 
-		public void Forward (URI uri, HttpListenerContext context)
+        public override void Pull(URI uri, HttpListenerContext context)
 		{
-			if (m_Childs.ContainsKey (uri.GetSegment ())) {
-				Resource child = m_Childs [uri.GetSegment ()];
-				uri.Next ();
+            if (uri.IsEnded)
+            {
+                StringBuilder builder = new StringBuilder();
+                builder.Append("{ 'Type':'ResourceCollection'; 'SubResources' : [");
+                foreach (string key in m_Childs.Keys)
+                {
+                    builder.Append("{ 'ID' : '");
+                    builder.Append(key);
+                    builder.Append("' ; 'Name' : '");
+                    builder.Append(m_Childs[key].Name);
+                    builder.Append("'}");
+                }
+                builder.Append("]}");
 
-				if (uri.IsEnded) {
-					child.WriteResource (context);
-				} else if (child is ICollectingResource) {
-					((ICollectingResource)child).Forward (uri, context);
-				} else {
-					throw new RESTProcessException ("Resouce Not Found", 404);
-				}
-			}	else {
-				throw new RESTProcessException ("Resouce Not Found", 404);
-			}
-		}
-
-		public override void WriteResource (HttpListenerContext context)
-		{
-			StringBuilder builder = new StringBuilder ();
-			builder.Append ("{ 'Type':'ResourceCollection'; 'SubResources' : [");
-			foreach (string key in m_Childs.Keys) {
-				builder.Append ("{ 'ID' : '");
-				builder.Append (key);
-				builder.Append ("' ; 'Name' : '");
-				builder.Append (m_Childs[key].Name);
-				builder.Append ("'}");
-			}
-			builder.Append ("]}");
-
-			Resource.WriteOut (context, builder.ToString ());
+                Resource.WriteOut(context, builder.ToString());
+            }
+            else
+            {
+                if (m_Childs.ContainsKey(uri.GetSegment()))
+                {
+                    var res = m_Childs[uri.GetSegment()];
+                    uri.Next();
+                    res.Pull(uri, context);
+                }
+                else
+                {
+                    throw RESTProcessException.ResorceNotFound;
+                }
+            }
 		}
 
 
@@ -59,13 +58,6 @@ namespace REST_Server
 		{
 			m_Childs.Remove (id);
 		}
-	}
-
-	public interface ICollectingResource : IResource
-	{
-		void Forward(URI uri, HttpListenerContext context);
-		void Add (string id, Resource res);
-		void Remove(string id);
 	}
 }
 

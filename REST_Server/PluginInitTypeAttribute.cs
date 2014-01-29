@@ -16,8 +16,6 @@ namespace REST_Server
 
 		public PluginInitTypeAttribute (Type initType)
 		{
-
-
 			if (typeof(PluginBase).IsAssignableFrom (initType)) {
 				m_InitType = initType;
 			} else {
