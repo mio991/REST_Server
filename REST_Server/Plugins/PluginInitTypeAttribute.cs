@@ -1,7 +1,10 @@
 using System;
 
-namespace REST_Server
+namespace REST_Server.Plugins
 {
+    /// <summary>
+    /// Atribute to Mark the Plugin-Class of an Assembly
+    /// </summary>
 	[AttributeUsage(AttributeTargets.Assembly, AllowMultiple = false)]
 	public class PluginInitTypeAttribute : Attribute
 	{
