@@ -64,5 +64,6 @@
     <None Include="server.log4net">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="server.xsd" />
   </ItemGroup>
 </Project>

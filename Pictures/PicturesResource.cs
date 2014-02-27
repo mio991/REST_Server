@@ -6,33 +6,26 @@ using REST_Server;
 using System.Net;
 using System.IO;
 using REST_Server.Resource;
+using UsersAndRights;
 
 namespace Pictures
 {
     class PicturesResource : Resource
     {
-        string m_PictureDirectory;
-        Server m_Server;
+        private string m_PictureDirectory;
+        private Server m_Server;
+        private UserAndRightsPlugin m_UserPlugin;
 
         /// <summary>
         /// Creates a new PictureResource Instance with the Directory wich contains the Pictures
         /// </summary>
         /// <param name="pDirectory">The Diretory that contains the pictures</param>
-        public PicturesResource(Server server, string pDirectory)
+        public PicturesResource(Server server, string pDirectory, UserAndRightsPlugin plugin)
             : base("Pictues")
         {
             m_PictureDirectory = pDirectory;
             m_Server = server;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        private bool HasRights(string id)
-        {
-            return true; //TODO Adding Right-Check
+            m_UserPlugin = plugin;
         }
 
         /// <summary>
@@ -42,22 +35,20 @@ namespace Pictures
         /// <param name="context">The HTTP-Context of the Request</param>
         public override void Pull(URI uri, HttpListenerContext context)
         {
+            Dictionary<string, object> sessionVariables = m_Server.GetSessionVariables(context);
+
             if (uri.IsEnded)
             {
                 var builder = new StringBuilder();
 
                 builder.Append("{ 'Type':'ResourceCollection'; 'SubResources' : [");
-                foreach (string pic in Directory.GetFiles(m_PictureDirectory))
+                foreach(Picture pic in Picture.GetPictures(m_Server, (User)m_Server.GetSessionVariables(context)["user"]))
                 {
-                    string id = Path.GetFileName(pic);
-                    if (HasRights(id))
-                    {
                         builder.Append("{ 'ID' : '");
-                        builder.Append(id);
+                        builder.Append(pic.ID);
                         builder.Append("' ; 'Name' : '");
-                        builder.Append(pic); // TODO Adding geting name from the DB
+                        builder.Append(pic.Name);
                         builder.Append("'}");
-                    }
                 }
                 builder.Append("]}");
 
@@ -65,20 +56,12 @@ namespace Pictures
             }
             else
             {
-                if (HasRights(uri.GetSegment()))
+                Picture pic = new Picture(uri.GetSegment(), m_Server, m_PictureDirectory);
+                if (m_UserPlugin.UserHasRights((User)m_Server.GetSessionVariables(context)["user"], Right.READ, pic))
                 {
-                    var requestedPic = m_PictureDirectory + uri.GetSegment();
+                    context.Response.ContentType = pic.MimeType;
+                    pic.WriteFileToStream(context.Response.OutputStream);
 
-                    if (!File.Exists(requestedPic))
-                    {
-                        throw RESTProcessException.ResorceNotFound;
-                    }
-
-                    var fStream = File.Open(requestedPic, FileMode.Open);
-
-                    fStream.CopyTo(context.Response.OutputStream);
-
-                    fStream.Close();
                 }
                 else
                 {

@@ -10,7 +10,7 @@ namespace REST_Server
         /// <summary>
         /// HTTP-Errorcode 404
         /// </summary>
-        public static readonly RESTProcessException ResorceNotFound = new RESTProcessException("Resouce Not Found", 404);
+        public static readonly RESTProcessException ResourceNotFound = new RESTProcessException("Resouce Not Found", 404);
         /// <summary>
         /// HTTP-Errorcode 401
         /// </summary>

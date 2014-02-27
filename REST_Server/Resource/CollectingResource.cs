@@ -53,7 +53,7 @@ namespace REST_Server.Resource
                 }
                 else
                 {
-                    throw RESTProcessException.ResorceNotFound;
+                    throw RESTProcessException.ResourceNotFound;
                 }
             }
 		}

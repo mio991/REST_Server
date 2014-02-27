@@ -29,9 +29,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Picture.cs" />
     <Compile Include="PicturesResource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PicturePlugin.cs" />
@@ -41,6 +43,10 @@
     <ProjectReference Include="..\REST_Server\REST_Server.csproj">
       <Project>{36BEA6DA-0E69-4FD3-B9D5-03431C805D61}</Project>
       <Name>REST_Server</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UsersAndRights\UsersAndRights.csproj">
+      <Project>{3c1cbd4e-1bee-4237-a0b9-992f74784a68}</Project>
+      <Name>UsersAndRights</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

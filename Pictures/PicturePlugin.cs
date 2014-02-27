@@ -27,7 +27,7 @@ namespace Pictures
                 Directory.CreateDirectory(m_Settings["saveDirectory"]);
             }
 
-            m_Resource = new PicturesResource(m_Server, m_Settings["saveDirectory"]);
+            m_Resource = new PicturesResource(m_Server, m_Settings["saveDirectory"], (UsersAndRights.UserAndRightsPlugin)m_Server.Plugins[m_Settings["UsersAndRightsPlugin"]]);
 
             m_Server.RootResource.Add("pictures", m_Resource);
         }

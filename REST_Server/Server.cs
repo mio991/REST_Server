@@ -10,6 +10,7 @@ using System.Text;
 using REST_Server.Resource;
 using REST_Server.Plugins;
 using System.Data;
+using System.Data.Common;
 
 namespace REST_Server
 {
@@ -24,6 +25,8 @@ namespace REST_Server
         /// DataBase-Connection
         /// </summary>
         private IDbConnection m_DBConnection;
+
+        private Dictionary<string, Dictionary<string, object>> m_SessionsVariables;
 
         /// <summary>
         /// Loging Entrypoint
@@ -127,6 +130,8 @@ namespace REST_Server
         /// <param name="host">The host-node of the server.config</param>
         private void InitListener(XmlNode host)
         {
+            Log.Info("Init Listener");
+
             m_Listener = new HttpListener();
             foreach (XmlNode listenerNode in host.ChildNodes)
             {
@@ -174,6 +179,8 @@ namespace REST_Server
         /// <param name="plugins">The plugins-node containing plugin-nodes</param>
         private void InitPlugins(XmlNode plugins)
         {
+            Log.Info("Init Plugins");
+
             foreach (XmlNode plugin in plugins.ChildNodes)
             {
                 if (plugin.Name == "plugin")
@@ -189,6 +196,8 @@ namespace REST_Server
         /// <param name="connectionNode">the Config node wich contains the Connection information</param>
         private void InitDBConnection(XmlNode connectionNode)
         {
+            Log.Info("Init Database Connection");
+
             string connectionString = null, assemblyName = null, type = null;
 
             foreach (XmlNode child in connectionNode.ChildNodes)
@@ -217,16 +226,33 @@ namespace REST_Server
 
             Log.Info(String.Format("Test DB-Connection: {0}", m_DBConnection.Database));
 
-            m_DBConnection.Open();
+            try
+            {
 
-            m_DBConnection.Close();
+                m_DBConnection.Open();
+
+                m_DBConnection.Close();
+
+            }
+            catch (DbException ex)
+            {
+                Log.Error(String.Format("Error ocured while connecting to database.\n\t{0}", ex.Message));
+            }
+        }
+
+        public IDbConnection DBConnection
+        {
+            get
+            {
+                return m_DBConnection;
+            }
         }
 
         /// <summary>
         /// Create a new Server configed by the server.config in the working-Directory
         /// </summary>
         /// <param name="workingDiretory">The Directory from wich the Server takes all the components and configuration</param>
-        public Server(string workingDiretory) // TODO Adding DB Connection
+        public Server(string workingDiretory) 
         {
             m_WorkingDirectory = workingDiretory;
 
@@ -258,11 +284,19 @@ namespace REST_Server
 
                 InitPlugins(doc.GetElementsByTagName("plugins")[0]);
 
+                m_SessionsVariables = new Dictionary<string, Dictionary<string, object>>();
+
             }
             catch (Exception ex)
             {
                 Log.Fatal("During the Initiation is an Error ocured", ex);
             }
+        }
+
+        public Dictionary<string, object> GetSessionVariables(HttpListenerContext context)
+        {
+            Cookie sessionid = context.Request.Cookies["sessionid"];
+            return m_SessionsVariables[sessionid.Value];
         }
 
         /// <summary>
