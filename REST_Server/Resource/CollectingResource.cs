@@ -20,14 +20,50 @@ namespace REST_Server.Resource
 			m_Server = server;
 		}
 
+        private bool TryForward(URI uri, HttpListenerContext context, RequestType type)
+        {
+            if (uri.IsEnded)
+            {
+                return false;
+            }
+            else
+            {
+                if (m_Childs.ContainsKey(uri.GetSegment()))
+                {
+                    var res = m_Childs[uri.GetSegment()];
+                    uri.Next();
+                    switch (type)
+                    {
+                        case RequestType.Get:
+                            res.Get(uri, context);
+                            break;
+                        case RequestType.Post:
+                            res.Post(uri, context);
+                            break;
+                        case RequestType.Put:
+                            res.Put(uri, context);
+                            break;
+                        case RequestType.Delete:
+                            res.Delete(uri, context);
+                            break;
+                    }
+                }
+                else
+                {
+                    throw RESTProcessException.ResourceNotFound;
+                }
+                return true;
+            }
+        }
+
         /// <summary>
         /// This Methode will called if the HTTP-Methode is 'PULL'
         /// </summary>
         /// <param name="uri">The requested Resource</param>
         /// <param name="context">The HTTP-Context of the request</param>
-        public override void Pull(URI uri, HttpListenerContext context)
+        public override void Get(URI uri, HttpListenerContext context)
 		{
-            if (uri.IsEnded)
+            if (!TryForward(uri,context,RequestType.Get))
             {
                 StringBuilder builder = new StringBuilder();
                 builder.Append("{ 'Type':'ResourceCollection'; 'SubResources' : [");
@@ -42,19 +78,6 @@ namespace REST_Server.Resource
                 builder.Append("]}");
 
                 Resource.WriteOut(context, builder.ToString());
-            }
-            else
-            {
-                if (m_Childs.ContainsKey(uri.GetSegment()))
-                {
-                    var res = m_Childs[uri.GetSegment()];
-                    uri.Next();
-                    res.Pull(uri, context);
-                }
-                else
-                {
-                    throw RESTProcessException.ResourceNotFound;
-                }
             }
 		}
 
@@ -76,6 +99,29 @@ namespace REST_Server.Resource
 		{
 			m_Childs.Remove (id);
 		}
-	}
+
+        public override void Post(URI uri, HttpListenerContext context)
+        {
+            throw new NotImplementedException(); //TODO Implement
+        }
+
+        public override void Put(URI uri, HttpListenerContext context)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Delete(URI uri, HttpListenerContext contect)
+        {
+            throw new NotImplementedException();
+        }
+
+        private enum RequestType
+        {
+            Get,
+            Post,
+            Put,
+            Delete
+        }
+    }
 }
 

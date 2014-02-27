@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace UsersAndRights
 {
+    // maybe sometimes usefull - INSERT INTO `rest`.`user` (`ID`, `Name`, `Pass`, `Salt`) VALUES ('{0}', '{1}', '{2}', 'fsdfsdf') ON DUPLICATE KEY UPDATE `Name` = VALUES(`Name`), `Pass`=VALUES(`Pass`), `Salt` = VALUES(`Salt`)
     public class User : RightObject
     {
         public User(string id)

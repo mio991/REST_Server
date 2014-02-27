@@ -33,7 +33,7 @@ namespace Pictures
         /// </summary>
         /// <param name="uri">the requested Resource (Picture)</param>
         /// <param name="context">The HTTP-Context of the Request</param>
-        public override void Pull(URI uri, HttpListenerContext context)
+        public override void Get(URI uri, HttpListenerContext context)
         {
             Dictionary<string, object> sessionVariables = m_Server.GetSessionVariables(context);
 
@@ -68,6 +68,45 @@ namespace Pictures
                     throw RESTProcessException.NotEnoughRights;
                 }
             }
+        }
+
+        public override void Post(URI uri, HttpListenerContext context)
+        {
+            
+        }
+
+        public override void Put(URI uri, HttpListenerContext context)
+        {
+            if (uri.IsEnded)
+            {
+                throw RESTProcessException.MethodeNotAllowed;
+            }
+            else
+            {
+                uri.Next();
+                User user = (User)m_Server.GetSessionVariables(context)["user"];
+                Dictionary<string, string> posts = Server.GetPostVariables(context);
+                Picture pic;
+                try
+                {
+                    pic = new Picture(uri.GetSegment(), m_Server, m_PictureDirectory);
+                }
+                catch (ArgumentException ex)
+                {
+                    pic = Picture.Create(m_Server, user, posts["name"], posts["mime"]);
+                    m_UserPlugin.GrantRightToUser(user, Right.WRITE | Right.READ, pic);
+                }
+                if (m_UserPlugin.UserHasRights(user, Right.WRITE, pic))
+                {
+
+                }
+
+            }
+        }
+
+        public override void Delete(URI uri, HttpListenerContext contect)
+        {
+            throw new NotImplementedException();
         }
     }
 }

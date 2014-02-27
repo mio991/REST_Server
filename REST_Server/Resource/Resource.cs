@@ -8,7 +8,7 @@ namespace REST_Server.Resource
 {
 	public abstract class Resource : IResource
 	{
-        public abstract void Pull(URI uri, HttpListenerContext context);
+        public abstract void Get(URI uri, HttpListenerContext context);
 
         private string m_Name;
 
@@ -46,6 +46,13 @@ namespace REST_Server.Resource
                 return m_Name;
             }
         }
+
+
+        public abstract void Post(URI uri, HttpListenerContext context);
+
+        public abstract void Put(URI uri, HttpListenerContext context);
+
+        public abstract void Delete(URI uri, HttpListenerContext contect);
     }
     
     /// <summary>
@@ -63,7 +70,15 @@ namespace REST_Server.Resource
         /// </summary>
         /// <param name="uri">The requested Resource</param>
         /// <param name="context">The HTTP-Context of the request</param>
-		void Pull (URI uri, HttpListenerContext context);
+		void Get (URI uri, HttpListenerContext context);
+
+        void Post(URI uri, HttpListenerContext context);
+
+        void Put(URI uri, HttpListenerContext context);
+
+        void Delete(URI uri, HttpListenerContext contect);
+
+
 	}
 }
 

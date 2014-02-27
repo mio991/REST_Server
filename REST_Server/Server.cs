@@ -362,6 +362,20 @@ namespace REST_Server
             while (!IsDisposed) { }
             Log.Info("End Log");
         }
+
+        public static Dictionary<string, string> GetPostVariables(HttpListenerContext context)
+        {
+            Dictionary<string, string> res = new Dictionary<string, string>();
+            StreamReader reader = new StreamReader(context.Request.InputStream);
+            string request = reader.ReadToEnd();
+            string[] variables = request.Split('&');
+            foreach (string var in variables)
+            {
+                string[] s = var.Split('=');
+                res.Add(s[0], s[1]);
+            }
+            return res;
+        }
     }
 }
 

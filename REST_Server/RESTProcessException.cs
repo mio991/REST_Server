@@ -2,6 +2,7 @@ using System;
 
 namespace REST_Server
 {
+    //TODO implement a way to give http-statuscode specified infomation back to the client (like allowed methodes for code 405)
     /// <summary>
     /// Exception if a Request runs in an Error
     /// </summary>
@@ -15,6 +16,14 @@ namespace REST_Server
         /// HTTP-Errorcode 401
         /// </summary>
         public static readonly RESTProcessException NotEnoughRights = new RESTProcessException("Not enough rights to get the Resource", 401);
+
+        /// <summary>
+        /// HTTP-Errorcode 405
+        /// </summary>
+        public static readonly RESTProcessException MethodeNotAllowed = new RESTProcessException("Methode not Allowed", 405);
+
+
+
 		private int m_ErrorCode;
 
         /// <summary>
