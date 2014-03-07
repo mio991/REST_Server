@@ -27,6 +27,9 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -49,4 +52,7 @@
       <Name>UsersAndRights</Name>
     </ProjectReference>
   </ItemGroup>
+  <PropertyGroup>
+    <PostBuildEvent>copy .\Pictures.dll ..\..\..\REST_Server\bin\Debug\Pictures.dll</PostBuildEvent>
+  </PropertyGroup>
 </Project>

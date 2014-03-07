@@ -173,6 +173,79 @@ namespace REST_Server
             m_Plugins.Add(plugin.Attributes["name"].Value, (PluginBase)Activator.CreateInstance(initType.InitType, settings, this));
         }
 
+        private class PluginLoader
+        {
+            string m_Assembly;
+            XmlNode m_Settings;
+            Server m_Server;
+            Assembly m_PluginAssembly;
+            string m_Name;
+
+            static List<Assembly> m_LoadedAssemblys = new List<Assembly>();
+
+            static PluginLoader()
+            {
+                AppDomain.CurrentDomain.AssemblyLoad += CurrentDomain_AssemblyLoad;
+            }
+
+            static void CurrentDomain_AssemblyLoad(object sender, AssemblyLoadEventArgs args)
+            {
+                m_LoadedAssemblys.Add(args.LoadedAssembly);
+            }
+
+            public PluginLoader(XmlNode plugin, Server server)
+            {
+                m_Server = server;
+
+                foreach (XmlNode node in plugin.ChildNodes)
+                {
+                    switch (node.Name)
+                    {
+                        case "assembly":
+                            m_Assembly = Path.GetFullPath(Path.Combine(m_Server.WorkingDirectory , node.Attributes["path"].Value));
+                            break;
+                        case "settings":
+                            m_Settings = node;
+                            break;
+                    }
+
+                    m_Name = plugin.Attributes["name"].Value;
+                }
+            }
+
+            public void Load()
+            {
+                bool isLoaded = false;
+
+                foreach (Assembly test in m_LoadedAssemblys)
+                {
+                    if (test.Location == m_Assembly)
+                    {
+                        isLoaded = true;
+                    }
+                }
+
+                if (!isLoaded)
+                {
+                    m_PluginAssembly = Assembly.LoadFile(m_Assembly);
+                    m_Server.Log.Info(String.Format("Load Assembly '{0}'", m_Assembly));
+                }
+                else
+                {
+                    m_Server.Log.Info(String.Format("Alredy Load Assembly '{0}'", m_Assembly));
+                }
+            }
+
+            public void Init()
+            {
+
+                m_Server.Log.Info(String.Format("Init Assembly '{0}'", m_Assembly));
+
+                PluginInitTypeAttribute initType = (PluginInitTypeAttribute)m_PluginAssembly.GetCustomAttributes(typeof(PluginInitTypeAttribute), true)[0];
+                m_Server.m_Plugins.Add(m_Name, (PluginBase)Activator.CreateInstance(initType.InitType, m_Settings, m_Server));
+            }
+        }
+
         /// <summary>
         /// Initialising all Plugins in the plugins-node
         /// </summary>
@@ -181,12 +254,30 @@ namespace REST_Server
         {
             Log.Info("Init Plugins");
 
+            Dictionary<int, PluginLoader> plugs = new Dictionary<int, PluginLoader>();
+
             foreach (XmlNode plugin in plugins.ChildNodes)
             {
                 if (plugin.Name == "plugin")
                 {
-                    InitPlugin(plugin);
+                    plugs.Add(int.Parse(plugin.Attributes["loadTime"].Value), new PluginLoader(plugin, this));
                 }
+            }
+
+            int i = plugs.Count-1;
+
+            while (i >= 0)
+            {
+                plugs[i].Load();
+                i--;
+            }
+
+            i++;
+
+            while (i < plugs.Count)
+            {
+                plugs[i].Init();
+                i++;
             }
         }
 

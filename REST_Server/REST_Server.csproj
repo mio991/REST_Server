@@ -66,4 +66,8 @@
     </None>
     <None Include="server.xsd" />
   </ItemGroup>
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
 </Project>
