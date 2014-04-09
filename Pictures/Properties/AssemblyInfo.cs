@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 // Information about this assembly is defined by the following attributes.
 // Change them to the values specific to your project.
-[assembly: AssemblyTitle ("Pictures")]
+[assembly: AssemblyTitle ("mio991.REST.Plugins.Files")]
 [assembly: AssemblyDescription ("")]
 [assembly: AssemblyConfiguration ("")]
 [assembly: AssemblyCompany ("")]

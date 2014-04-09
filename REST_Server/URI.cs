@@ -1,6 +1,6 @@
 using System;
 
-namespace REST_Server
+namespace mio991.REST.Server
 {
 	public class URI
 	{

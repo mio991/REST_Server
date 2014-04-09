@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Express 2012 for Windows Desktop
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "REST_Server", "REST_Server\REST_Server.csproj", "{36BEA6DA-0E69-4FD3-B9D5-03431C805D61}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mio991.REST.Server", "REST_Server\mio991.REST.Server.csproj", "{36BEA6DA-0E69-4FD3-B9D5-03431C805D61}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pictures", "Pictures\Pictures.csproj", "{8C79FCCC-AE95-4040-BE74-2E9BDD730081}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mio991.REST.Plugins.Files", "Pictures\mio991.REST.Plugins.Files.csproj", "{8C79FCCC-AE95-4040-BE74-2E9BDD730081}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsersAndRights", "UsersAndRights\UsersAndRights.csproj", "{3C1CBD4E-1BEE-4237-A0B9-992F74784A68}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mio991.REST.Plugins.UsersAndRights", "UsersAndRights\mio991.REST.Plugins.UsersAndRights.csproj", "{3C1CBD4E-1BEE-4237-A0B9-992F74784A68}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

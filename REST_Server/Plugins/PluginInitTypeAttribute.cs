@@ -1,6 +1,6 @@
 using System;
 
-namespace REST_Server.Plugins
+namespace mio991.REST.Server.Plugins
 {
     /// <summary>
     /// Atribute to Mark the Plugin-Class of an Assembly

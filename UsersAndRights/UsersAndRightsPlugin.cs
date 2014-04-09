@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using REST_Server.Plugins;
-using REST_Server;
+using mio991.REST.Server.Plugins;
+using mio991.REST.Server;
 using System.Data;
 
-[assembly:PluginInitType(typeof(UsersAndRights.UserAndRightsPlugin))]
+[assembly:PluginInitType(typeof(mio991.REST.Plugins.UsersAndRights.UserAndRightsPlugin))]
 
 /*
 SELECT * FROM user
@@ -16,7 +16,7 @@ ON user.id = object_user.object_id
 WHERE object_user.rights & 'READ'
  */
 
-namespace UsersAndRights
+namespace mio991.REST.Plugins.UsersAndRights
 {
     public class UserAndRightsPlugin : PluginBase
     {
@@ -37,11 +37,17 @@ namespace UsersAndRights
             }
         }
 
-        public UserAndRightsPlugin(System.Xml.XmlNode settings, Server server)
+        public UserAndRightsPlugin(System.Xml.XmlNode settings, Server.Server server)
             : base(settings, server)
         {
             m_UserTable = m_Settings["user"];
             m_UserObjectTable = m_Settings["objectUser"];
+            m_Server.SessionGenerated += m_Server_SessionGenerated;
+        }
+
+        void m_Server_SessionGenerated(object sender, SessionGenaretedEventArgs e)
+        {
+            e.NewSessionVariables.Add("user", User.Guest);
         }
 
         public bool UserHasRights(User user, Right right, RightObject obj)

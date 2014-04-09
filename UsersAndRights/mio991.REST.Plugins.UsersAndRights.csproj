@@ -7,8 +7,8 @@
     <ProjectGuid>{3C1CBD4E-1BEE-4237-A0B9-992F74784A68}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>UsersAndRights</RootNamespace>
-    <AssemblyName>UsersAndRights</AssemblyName>
+    <RootNamespace>mio991.REST.Plugins.UsersAndRights</RootNamespace>
+    <AssemblyName>mio991.REST.Plugins.UsersAndRights</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -50,9 +50,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\REST_Server\REST_Server.csproj">
+    <ProjectReference Include="..\REST_Server\mio991.REST.Server.csproj">
       <Project>{36bea6da-0e69-4fd3-b9d5-03431c805d61}</Project>
-      <Name>REST_Server</Name>
+      <Name>mio991.REST.Server</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
 
-namespace REST_Server.Plugins
+namespace mio991.REST.Server.Plugins
 {
 	public abstract class PluginBase : IDisposable
 	{

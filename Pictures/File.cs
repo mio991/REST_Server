@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using UsersAndRights;
-using REST_Server;
+using mio991.REST.Plugins.UsersAndRights;
+using mio991.REST.Server;
 using System.IO;
 using System.Data;
 
-namespace Pictures
+namespace mio991.REST.Plugins.Files
 {
-    class Picture : RightObject
+    class File : RightObject
     {
-        private Server m_Server;
+        private Server.Server m_Server;
         private string m_Name;
         private string m_FileDirectory;
         private string m_MimeType;
@@ -35,7 +35,7 @@ namespace Pictures
         public void WriteFileToStream(Stream outStream)
         {
             string path = m_FileDirectory + ID;
-            if (File.Exists(path))
+            if (System.IO.File.Exists(path))
             {
                 FileStream picStream = new FileStream(path, FileMode.Open);
                 picStream.CopyTo(outStream);
@@ -43,18 +43,18 @@ namespace Pictures
             }
         }
 
-        public static Picture Create(Server server, User user, string name, string mime)
+        public static File Create(Server.Server server, User user, string name, string mime)
         {
-            Picture result = null;
+            File result = null;
             lock (server.DBConnection)
             {
                 server.DBConnection.Open();
                 IDbCommand command = server.DBConnection.CreateCommand();
-                command.CommandText = String.Format("INSERT INTO `rest`.`pictures` (`ID`, `Name`, `mimeType`) VALUES ('{0}', '{1}', '{2}');", Guid.NewGuid(), name, mime);
+                command.CommandText = String.Format("INSERT INTO `rest`.`mio991.REST.Plugins.Files` (`ID`, `Name`, `mimeType`) VALUES ('{0}', '{1}', '{2}');", Guid.NewGuid(), name, mime);
                 IDataReader reader = command.ExecuteReader();
                 while (reader.Read())
                 {
-                    result = new Picture(reader);
+                    result = new File(reader);
                 }
                 reader.Close();
                 server.DBConnection.Close();
@@ -62,25 +62,24 @@ namespace Pictures
             return result;
         }
 
-        public static Picture[] GetPictures(Server server, User user)
+        public static File[] GetFile(Server.Server server, User user)
         {
-            Picture[] result;
+            List<File> result = new List<File>();
             lock (server.DBConnection)
             {
                 server.DBConnection.Open();
                 IDbCommand command = server.DBConnection.CreateCommand();
-                command.CommandText = String.Format("SELECT pictures.* FROM pictures LEFT JOIN object_user ON pictures.id = object_user.object_id WHERE object_user.user_id = '{0}'", user.ID);
+                command.CommandText = String.Format("SELECT mio991.REST.Plugins.Files.* FROM mio991.REST.Plugins.Files LEFT JOIN object_user ON mio991.REST.Plugins.Files.id = object_user.object_id WHERE object_user.user_id = '{0}'", user.ID);
                 IDataReader reader = command.ExecuteReader();
-                result = new Picture[reader.RecordsAffected];
                 int i = 0;
                 while (reader.Read())
                 {
-                    result[i] = new Picture(reader);
+                    result.Add(new File(reader));
                 }
                 reader.Close();
                 server.DBConnection.Close();
             }
-            return result;
+            return result.ToArray();
         }
 
         private void LoadFromReader(IDataReader reader)
@@ -89,8 +88,8 @@ namespace Pictures
             m_MimeType = reader.GetString(reader.GetOrdinal("mimeType"));
         }
 
-        private Picture(IDataReader reader)
-            : base(reader, "pictures")
+        private File(IDataReader reader)
+            : base(reader, "mio991.REST.Plugins.Files")
         {
             LoadFromReader(reader);
         }
@@ -101,7 +100,7 @@ namespace Pictures
             {
                 m_Server.DBConnection.Open();
                 IDbCommand command = m_Server.DBConnection.CreateCommand();
-                command.CommandText = String.Format("INSERT INTO `rest`.`pictures` (`ID`, `Name`, `mimeType`) VALUES ('{0}', '{1}', '{2}') ON DUPLICATE KEY UPDATE `Name` = VALUES(`Name`), `mimeType` = VALUES(`mimeType`)", ID, name,mime);
+                command.CommandText = String.Format("INSERT INTO `rest`.`mio991.REST.Plugins.Files` (`ID`, `Name`, `mimeType`) VALUES ('{0}', '{1}', '{2}') ON DUPLICATE KEY UPDATE `Name` = VALUES(`Name`), `mimeType` = VALUES(`mimeType`)", ID, name,mime);
                 command.ExecuteNonQuery();
                 m_Server.DBConnection.Close();
             }
@@ -113,8 +112,8 @@ namespace Pictures
             pic.Write(buffer, 0, buffer.Length);
         }
 
-        public Picture(string id, Server server, string fileDiretory)
-            : base("pictures", id)
+        public File(string id, Server.Server server, string fileDiretory)
+            : base("mio991.REST.Plugins.Files", id)
         {
             m_Server = server;
             m_FileDirectory = fileDiretory;

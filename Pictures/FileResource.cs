@@ -2,25 +2,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using REST_Server;
+using mio991.REST.Server;
 using System.Net;
 using System.IO;
-using REST_Server.Resource;
-using UsersAndRights;
+using mio991.REST.Server.Resource;
+using mio991.REST.Plugins.UsersAndRights;
 
-namespace Pictures
+namespace mio991.REST.Plugins.Files
 {
-    class PicturesResource : Resource
+    class FileResource : Resource
     {
         private string m_PictureDirectory;
-        private Server m_Server;
+        private Server.Server m_Server;
         private UserAndRightsPlugin m_UserPlugin;
 
         /// <summary>
-        /// Creates a new PictureResource Instance with the Directory wich contains the Pictures
+        /// Creates a new PictureResource Instance with the Directory wich contains the mio991.REST.Plugins.Files
         /// </summary>
-        /// <param name="pDirectory">The Diretory that contains the pictures</param>
-        public PicturesResource(Server server, string pDirectory, UserAndRightsPlugin plugin)
+        /// <param name="pDirectory">The Diretory that contains the mio991.REST.Plugins.Files</param>
+        public FileResource(Server.Server server, string pDirectory, UserAndRightsPlugin plugin)
             : base("Pictues")
         {
             m_PictureDirectory = pDirectory;
@@ -41,13 +41,13 @@ namespace Pictures
             {
                 var builder = new StringBuilder();
 
-                builder.Append("{ 'Type':'ResourceCollection'; 'SubResources' : [");
-                foreach(Picture pic in Picture.GetPictures(m_Server, (User)m_Server.GetSessionVariables(context)["user"]))
+                builder.Append("{ 'Type':'ResourceCollection'; 'SubResources' : [");                
+                foreach(File file in File.GetFile(m_Server, (User)sessionVariables["user"]))
                 {
                         builder.Append("{ 'ID' : '");
-                        builder.Append(pic.ID);
+                        builder.Append(file.ID);
                         builder.Append("' ; 'Name' : '");
-                        builder.Append(pic.Name);
+                        builder.Append(file.Name);
                         builder.Append("'}");
                 }
                 builder.Append("]}");
@@ -56,7 +56,7 @@ namespace Pictures
             }
             else
             {
-                Picture pic = new Picture(uri.GetSegment(), m_Server, m_PictureDirectory);
+                File pic = new File(uri.GetSegment(), m_Server, m_PictureDirectory);
                 if (m_UserPlugin.UserHasRights((User)m_Server.GetSessionVariables(context)["user"], Right.READ, pic))
                 {
                     context.Response.ContentType = pic.MimeType;
@@ -85,15 +85,15 @@ namespace Pictures
             {
                 uri.Next();
                 User user = (User)m_Server.GetSessionVariables(context)["user"];
-                Dictionary<string, string> posts = Server.GetPostVariables(context);
-                Picture pic;
+                Dictionary<string, string> posts = Server.Server.GetPostVariables(context);
+                File pic;
                 try
                 {
-                    pic = new Picture(uri.GetSegment(), m_Server, m_PictureDirectory);
+                    pic = new File(uri.GetSegment(), m_Server, m_PictureDirectory);
                 }
                 catch (ArgumentException ex)
                 {
-                    pic = Picture.Create(m_Server, user, posts["name"], posts["mime"]);
+                    pic = File.Create(m_Server, user, posts["name"], posts["mime"]);
                     m_UserPlugin.GrantRightToUser(user, Right.WRITE | Right.READ, pic);
                 }
                 if (m_UserPlugin.UserHasRights(user, Right.WRITE, pic))

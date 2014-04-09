@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data;
 
-namespace UsersAndRights
+namespace mio991.REST.Plugins.UsersAndRights
 {
     public abstract class RightObject
     {

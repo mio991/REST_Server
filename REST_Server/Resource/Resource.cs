@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using System.Collections.Generic;
 
-namespace REST_Server.Resource
+namespace mio991.REST.Server.Resource
 {
 	public abstract class Resource : IResource
 	{

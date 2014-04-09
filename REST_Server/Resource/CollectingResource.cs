@@ -4,7 +4,7 @@ using System.Text;
 using System.Net;
 using System.Collections;
 
-namespace REST_Server.Resource
+namespace mio991.REST.Server.Resource
 {
 	public class CollectingResource : Resource
 	{

@@ -7,8 +7,8 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{8C79FCCC-AE95-4040-BE74-2E9BDD730081}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>Pictures</RootNamespace>
-    <AssemblyName>Pictures</AssemblyName>
+    <RootNamespace>mio991.REST.Plugins.Files</RootNamespace>
+    <AssemblyName>mio991.REST.Plugins.Files</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -36,20 +36,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Picture.cs" />
-    <Compile Include="PicturesResource.cs" />
+    <Compile Include="File.cs" />
+    <Compile Include="FileResource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PicturePlugin.cs" />
+    <Compile Include="FilePlugin.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\REST_Server\REST_Server.csproj">
+    <ProjectReference Include="..\REST_Server\mio991.REST.Server.csproj">
       <Project>{36BEA6DA-0E69-4FD3-B9D5-03431C805D61}</Project>
-      <Name>REST_Server</Name>
+      <Name>mio991.REST.Server</Name>
     </ProjectReference>
-    <ProjectReference Include="..\UsersAndRights\UsersAndRights.csproj">
+    <ProjectReference Include="..\UsersAndRights\mio991.REST.Plugins.UsersAndRights.csproj">
       <Project>{3c1cbd4e-1bee-4237-a0b9-992f74784a68}</Project>
-      <Name>UsersAndRights</Name>
+      <Name>mio991.REST.Plugins.UsersAndRights</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

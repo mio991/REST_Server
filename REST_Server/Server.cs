@@ -7,12 +7,12 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using System.Text;
-using REST_Server.Resource;
-using REST_Server.Plugins;
+using mio991.REST.Server.Resource;
+using mio991.REST.Server.Plugins;
 using System.Data;
 using System.Data.Common;
 
-namespace REST_Server
+namespace mio991.REST.Server
 {
     public class Server : IDisposable
     {
@@ -387,8 +387,20 @@ namespace REST_Server
         public Dictionary<string, object> GetSessionVariables(HttpListenerContext context)
         {
             Cookie sessionid = context.Request.Cookies["sessionid"];
+            if (sessionid == null)
+            {
+                sessionid = new Cookie("sessionid", Guid.NewGuid().ToString());
+                context.Request.Cookies.Add(sessionid);
+                m_SessionsVariables.Add(sessionid.Value, new Dictionary<string, object>());
+                if (SessionGenerated != null)
+                {
+                    SessionGenerated(this, new SessionGenaretedEventArgs(m_SessionsVariables[sessionid.Value]));
+                }
+            }
             return m_SessionsVariables[sessionid.Value];
         }
+
+        public event EventHandler<SessionGenaretedEventArgs> SessionGenerated;
 
         /// <summary>
         /// The Callback for asyncrounus listening

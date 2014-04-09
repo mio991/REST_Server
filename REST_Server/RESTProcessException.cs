@@ -1,6 +1,6 @@
 using System;
 
-namespace REST_Server
+namespace mio991.REST.Server
 {
     //TODO implement a way to give http-statuscode specified infomation back to the client (like allowed methodes for code 405)
     /// <summary>

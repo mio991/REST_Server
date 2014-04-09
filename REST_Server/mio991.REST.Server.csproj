@@ -7,9 +7,9 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{36BEA6DA-0E69-4FD3-B9D5-03431C805D61}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>REST_Server</RootNamespace>
-    <AssemblyName>REST_Server</AssemblyName>
-    <StartupObject>REST_Server.MainClass</StartupObject>
+    <RootNamespace>mio991.REST.Server</RootNamespace>
+    <AssemblyName>mio991.REST.Server</AssemblyName>
+    <StartupObject>mio991.REST.Server.MainClass</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -43,12 +43,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="MainClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="Plugins\PluginBase.cs" />
     <Compile Include="Resource\Resource.cs" />
     <Compile Include="Resource\CollectingResource.cs" />
+    <Compile Include="SessionGenaretedEventArgs.cs" />
     <Compile Include="URI.cs" />
     <Compile Include="RequestHandler.cs" />
     <Compile Include="RESTProcessException.cs" />
