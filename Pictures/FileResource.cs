@@ -19,8 +19,8 @@ namespace mio991.REST.Plugins.Files
         /// Creates a new PictureResource Instance with the Directory wich contains the mio991.REST.Plugins.Files
         /// </summary>
         /// <param name="pDirectory">The Diretory that contains the mio991.REST.Plugins.Files</param>
-        public FileResource(string pDirectory, UserAndRightsPlugin plugin)
-            : base("Pictues")
+        public FileResource(string id,string pDirectory, UserAndRightsPlugin plugin)
+            : base(id)
         {
             m_PictureDirectory = pDirectory;
             m_UserPlugin = plugin;

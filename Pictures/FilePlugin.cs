@@ -26,9 +26,9 @@ namespace mio991.REST.Plugins.Files
                 Directory.CreateDirectory(m_Settings["saveDirectory"]);
             }
 
-            m_Resource = new FileResource(m_Settings["saveDirectory"], (mio991.REST.Plugins.UsersAndRights.UserAndRightsPlugin)Server.Server.Plugins[m_Settings["mio991.REST.Plugins.UsersAndRightsPlugin"]]);
+            m_Resource = new FileResource(m_Settings["ResName"], m_Settings["saveDirectory"], (mio991.REST.Plugins.UsersAndRights.UserAndRightsPlugin)Server.Server.Plugins[m_Settings["UsersAndRightsPlugin"]]);
 
-            Server.Server.RootResource.Add("mio991.REST.Plugins.Files", m_Resource);
+            Server.Server.RootResource.Add(m_Settings["ResID"], m_Resource);
         }
     }
 }
