@@ -9,15 +9,12 @@ namespace mio991.REST.Server.Resource
 	public class CollectingResource : Resource
 	{
 		private Dictionary<string, Resource> m_Childs = new Dictionary<string, Resource>();
-		private Server m_Server;
 
         /// <summary>
         /// Creates a new Instance of the Collecting Resource
         /// </summary>
-        /// <param name="server">The Server holding the Resource</param>
         /// <param name="name">The Name of the Resource</param>
-		public CollectingResource (Server server, string name) : base(name){
-			m_Server = server;
+		public CollectingResource (string name) : base(name){
 		}
 
         private bool TryForward(URI uri, HttpListenerContext context, RequestType type)

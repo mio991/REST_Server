@@ -13,18 +13,16 @@ namespace mio991.REST.Plugins.Files
     class FileResource : Resource
     {
         private string m_PictureDirectory;
-        private Server.Server m_Server;
         private UserAndRightsPlugin m_UserPlugin;
 
         /// <summary>
         /// Creates a new PictureResource Instance with the Directory wich contains the mio991.REST.Plugins.Files
         /// </summary>
         /// <param name="pDirectory">The Diretory that contains the mio991.REST.Plugins.Files</param>
-        public FileResource(Server.Server server, string pDirectory, UserAndRightsPlugin plugin)
+        public FileResource(string pDirectory, UserAndRightsPlugin plugin)
             : base("Pictues")
         {
             m_PictureDirectory = pDirectory;
-            m_Server = server;
             m_UserPlugin = plugin;
         }
 
@@ -35,14 +33,14 @@ namespace mio991.REST.Plugins.Files
         /// <param name="context">The HTTP-Context of the Request</param>
         public override void Get(URI uri, HttpListenerContext context)
         {
-            Dictionary<string, object> sessionVariables = m_Server.GetSessionVariables(context);
+            Dictionary<string, object> sessionVariables = Server.Server.GetSessionVariables(context);
 
             if (uri.IsEnded)
             {
                 var builder = new StringBuilder();
 
                 builder.Append("{ 'Type':'ResourceCollection'; 'SubResources' : [");                
-                foreach(File file in File.GetFile(m_Server, (User)sessionVariables["user"]))
+                foreach(File file in File.GetFile((User)sessionVariables["user"]))
                 {
                         builder.Append("{ 'ID' : '");
                         builder.Append(file.ID);
@@ -56,8 +54,8 @@ namespace mio991.REST.Plugins.Files
             }
             else
             {
-                File pic = new File(uri.GetSegment(), m_Server, m_PictureDirectory);
-                if (m_UserPlugin.UserHasRights((User)m_Server.GetSessionVariables(context)["user"], Right.READ, pic))
+                File pic = new File(uri.GetSegment(), m_PictureDirectory);
+                if (m_UserPlugin.UserHasRights((User)Server.Server.GetSessionVariables(context)["user"], Right.READ, pic))
                 {
                     context.Response.ContentType = pic.MimeType;
                     pic.WriteFileToStream(context.Response.OutputStream);
@@ -84,16 +82,16 @@ namespace mio991.REST.Plugins.Files
             else
             {
                 uri.Next();
-                User user = (User)m_Server.GetSessionVariables(context)["user"];
+                User user = (User)Server.Server.GetSessionVariables(context)["user"];
                 Dictionary<string, string> posts = Server.Server.GetPostVariables(context);
                 File pic;
                 try
                 {
-                    pic = new File(uri.GetSegment(), m_Server, m_PictureDirectory);
+                    pic = new File(uri.GetSegment(), m_PictureDirectory);
                 }
                 catch (ArgumentException ex)
                 {
-                    pic = File.Create(m_Server, user, posts["name"], posts["mime"]);
+                    pic = File.Create(user, posts["name"], posts["mime"]);
                     m_UserPlugin.GrantRightToUser(user, Right.WRITE | Right.READ, pic);
                 }
                 if (m_UserPlugin.UserHasRights(user, Right.WRITE, pic))

@@ -14,7 +14,7 @@ using System.Data.Common;
 
 namespace mio991.REST.Server
 {
-    public class Server : IDisposable
+    public static class Server
     {
         /// <summary>
         /// URL Seperator Char
@@ -24,49 +24,49 @@ namespace mio991.REST.Server
         /// <summary>
         /// DataBase-Connection
         /// </summary>
-        private IDbConnection m_DBConnection;
+        private static IDbConnection m_DBConnection;
 
-        private Dictionary<string, Dictionary<string, object>> m_SessionsVariables;
+        private static Dictionary<string, Dictionary<string, object>> m_SessionsVariables;
 
         /// <summary>
         /// Loging Entrypoint
         /// </summary>
-        private ILog m_Log;
+        private static ILog m_Log;
 
         /// <summary>
         /// A Collection of the loaded Plugins 
         /// </summary>
-        private Dictionary<string, PluginBase> m_Plugins;
+        private static Dictionary<string, PluginBase> m_Plugins;
 
         /// <summary>
         /// The Listener used to Received the Requests.
         /// </summary>
-        private HttpListener m_Listener;
+        private static HttpListener m_Listener;
 
         /// <summary>
         /// A instance of the Class which Handles the Requests.
         /// </summary>
-        private RequestHandler m_Handler;
+        private static RequestHandler m_Handler;
 
         /// <summary>
         /// The Directory the Server is Working in.
         /// </summary>
-        private string m_WorkingDirectory;
+        private static string m_WorkingDirectory;
 
         /// <summary>
         /// The Resource used to Entry the Tree.
         /// </summary>
-        private CollectingResource m_RootResource;
+        private static CollectingResource m_RootResource;
 
         /// <summary>
         /// Used to check if Disposed.
         /// </summary>
-        private bool m_ListenerIsDisposed = false;
+        private static bool m_ListenerIsDisposed = false;
 
         /// <summary>
         /// A collection of all loaded plugins.
         /// </summary>
-        public Dictionary<string, PluginBase> Plugins
+        public static Dictionary<string, PluginBase> Plugins
         {
             get
             {
@@ -77,7 +77,7 @@ namespace mio991.REST.Server
         /// <summary>
         /// The root-resource which will be called for each request.
         /// </summary>
-        public CollectingResource RootResource
+        public static CollectingResource RootResource
         {
             get
             {
@@ -88,7 +88,7 @@ namespace mio991.REST.Server
         /// <summary>
         /// The logging entrypoint
         /// </summary>
-        public ILog Log
+        public static ILog Log
         {
             get
             {
@@ -99,7 +99,7 @@ namespace mio991.REST.Server
         /// <summary>
         /// The Directory the server is runing in
         /// </summary>
-        public string WorkingDirectory
+        public static string WorkingDirectory
         {
             get
             {
@@ -110,7 +110,7 @@ namespace mio991.REST.Server
         /// <summary>
         /// A methode to initialise the logging.
         /// </summary>
-        private void InitLoging()
+        private static void InitLoging()
         {
             string serverLog4net = m_WorkingDirectory + Path.DirectorySeparatorChar + "server.log4net";
 
@@ -128,7 +128,7 @@ namespace mio991.REST.Server
         /// Initialising the Listener with the data from the host-node of the server.config.
         /// </summary>
         /// <param name="host">The host-node of the server.config</param>
-        private void InitListener(XmlNode host)
+        private static void InitListener(XmlNode host)
         {
             Log.Info("Init Listener");
 
@@ -146,7 +146,7 @@ namespace mio991.REST.Server
         /// Initialise one Plugin with the plugin-node.
         /// </summary>
         /// <param name="plugin">The plugins-node</param>
-        private void InitPlugin(XmlNode plugin)
+        private static void InitPlugin(XmlNode plugin)
         {
             XmlNode settings = null, assemblyNode = null;
 
@@ -170,14 +170,13 @@ namespace mio991.REST.Server
             Log.Info(String.Format("Load Assembly '{0}'", path));
 
             PluginInitTypeAttribute initType = (PluginInitTypeAttribute)assembly.GetCustomAttributes(typeof(PluginInitTypeAttribute), true)[0];
-            m_Plugins.Add(plugin.Attributes["name"].Value, (PluginBase)Activator.CreateInstance(initType.InitType, settings, this));
+            m_Plugins.Add(plugin.Attributes["name"].Value, (PluginBase)Activator.CreateInstance(initType.InitType, settings));
         }
 
         private class PluginLoader
         {
             string m_Assembly;
             XmlNode m_Settings;
-            Server m_Server;
             Assembly m_PluginAssembly;
             string m_Name;
 
@@ -193,16 +192,15 @@ namespace mio991.REST.Server
                 m_LoadedAssemblys.Add(args.LoadedAssembly);
             }
 
-            public PluginLoader(XmlNode plugin, Server server)
+            public PluginLoader(XmlNode plugin)
             {
-                m_Server = server;
 
                 foreach (XmlNode node in plugin.ChildNodes)
                 {
                     switch (node.Name)
                     {
                         case "assembly":
-                            m_Assembly = Path.GetFullPath(Path.Combine(m_Server.WorkingDirectory , node.Attributes["path"].Value));
+                            m_Assembly = Path.GetFullPath(Path.Combine(Server.WorkingDirectory , node.Attributes["path"].Value));
                             break;
                         case "settings":
                             m_Settings = node;
@@ -228,21 +226,21 @@ namespace mio991.REST.Server
                 if (!isLoaded)
                 {
                     m_PluginAssembly = Assembly.LoadFile(m_Assembly);
-                    m_Server.Log.Info(String.Format("Load Assembly '{0}'", m_Assembly));
+                    Server.Log.Info(String.Format("Load Assembly '{0}'", m_Assembly));
                 }
                 else
                 {
-                    m_Server.Log.Info(String.Format("Alredy Load Assembly '{0}'", m_Assembly));
+                    Server.Log.Info(String.Format("Alredy Load Assembly '{0}'", m_Assembly));
                 }
             }
 
             public void Init()
             {
 
-                m_Server.Log.Info(String.Format("Init Assembly '{0}'", m_Assembly));
+                Server.Log.Info(String.Format("Init Assembly '{0}'", m_Assembly));
 
                 PluginInitTypeAttribute initType = (PluginInitTypeAttribute)m_PluginAssembly.GetCustomAttributes(typeof(PluginInitTypeAttribute), true)[0];
-                m_Server.m_Plugins.Add(m_Name, (PluginBase)Activator.CreateInstance(initType.InitType, m_Settings, m_Server));
+                Server.m_Plugins.Add(m_Name, (PluginBase)Activator.CreateInstance(initType.InitType, m_Settings));
             }
         }
 
@@ -250,7 +248,7 @@ namespace mio991.REST.Server
         /// Initialising all Plugins in the plugins-node
         /// </summary>
         /// <param name="plugins">The plugins-node containing plugin-nodes</param>
-        private void InitPlugins(XmlNode plugins)
+        private static void InitPlugins(XmlNode plugins)
         {
             Log.Info("Init Plugins");
 
@@ -260,7 +258,7 @@ namespace mio991.REST.Server
             {
                 if (plugin.Name == "plugin")
                 {
-                    plugs.Add(int.Parse(plugin.Attributes["loadTime"].Value), new PluginLoader(plugin, this));
+                    plugs.Add(int.Parse(plugin.Attributes["loadTime"].Value), new PluginLoader(plugin));
                 }
             }
 
@@ -285,7 +283,7 @@ namespace mio991.REST.Server
         /// Creating a Connection to a DataBase and Test it.
         /// </summary>
         /// <param name="connectionNode">the Config node wich contains the Connection information</param>
-        private void InitDBConnection(XmlNode connectionNode)
+        private static void InitDBConnection(XmlNode connectionNode)
         {
             Log.Info("Init Database Connection");
 
@@ -331,7 +329,7 @@ namespace mio991.REST.Server
             }
         }
 
-        public IDbConnection DBConnection
+        public static IDbConnection DBConnection
         {
             get
             {
@@ -343,7 +341,7 @@ namespace mio991.REST.Server
         /// Create a new Server configed by the server.config in the working-Directory
         /// </summary>
         /// <param name="workingDiretory">The Directory from wich the Server takes all the components and configuration</param>
-        public Server(string workingDiretory) 
+        public static void Init(string workingDiretory) 
         {
             m_WorkingDirectory = workingDiretory;
 
@@ -358,8 +356,8 @@ namespace mio991.REST.Server
                 string serverConfig = m_WorkingDirectory + Path.DirectorySeparatorChar + "server.config";
 
                 m_CallBack = new AsyncCallback(ListenerCallBack);
-                m_Handler = new RequestHandler(this, new UnicodeEncoding());
-                m_RootResource = new CollectingResource(this, "root");
+                m_Handler = new RequestHandler(new UnicodeEncoding());
+                m_RootResource = new CollectingResource("root");
 
                 if (!File.Exists(serverConfig))
                 {
@@ -384,7 +382,7 @@ namespace mio991.REST.Server
             }
         }
 
-        public Dictionary<string, object> GetSessionVariables(HttpListenerContext context)
+        public static Dictionary<string, object> GetSessionVariables(HttpListenerContext context)
         {
             Cookie sessionid = context.Request.Cookies["sessionid"];
             if (sessionid == null)
@@ -394,23 +392,23 @@ namespace mio991.REST.Server
                 m_SessionsVariables.Add(sessionid.Value, new Dictionary<string, object>());
                 if (SessionGenerated != null)
                 {
-                    SessionGenerated(this, new SessionGenaretedEventArgs(m_SessionsVariables[sessionid.Value]));
+                    SessionGenerated(null, new SessionGenaretedEventArgs(m_SessionsVariables[sessionid.Value]));
                 }
             }
             return m_SessionsVariables[sessionid.Value];
         }
 
-        public event EventHandler<SessionGenaretedEventArgs> SessionGenerated;
+        public static event EventHandler<SessionGenaretedEventArgs> SessionGenerated;
 
         /// <summary>
         /// The Callback for asyncrounus listening
         /// </summary>
-        private AsyncCallback m_CallBack;
+        private static AsyncCallback m_CallBack;
 
         /// <summary>
         /// Start the Server
         /// </summary>
-        public void Start()
+        public static void Start()
         {
             m_Listener.Start();
             foreach (string prefix in m_Listener.Prefixes)
@@ -425,7 +423,7 @@ namespace mio991.REST.Server
         /// Handles the Requests
         /// </summary>
         /// <param name="result"></param>
-        private void ListenerCallBack(IAsyncResult result)
+        private static void ListenerCallBack(IAsyncResult result)
         {
             try
             {
@@ -447,7 +445,7 @@ namespace mio991.REST.Server
         /// <summary>
         /// If all components are Disposed
         /// </summary>
-        public bool IsDisposed
+        public static bool IsDisposed
         {
             get
             {
@@ -458,7 +456,7 @@ namespace mio991.REST.Server
         /// <summary>
         /// Stops the Server
         /// </summary>
-        public void Dispose()
+        public static void Stop()
         {
             Log.Info("Stoping Server");
             m_Listener.Abort();

@@ -11,7 +11,6 @@ namespace mio991.REST.Plugins.Files
 {
     class File : RightObject
     {
-        private Server.Server m_Server;
         private string m_Name;
         private string m_FileDirectory;
         private string m_MimeType;
@@ -43,13 +42,13 @@ namespace mio991.REST.Plugins.Files
             }
         }
 
-        public static File Create(Server.Server server, User user, string name, string mime)
+        public static File Create(User user, string name, string mime)
         {
             File result = null;
-            lock (server.DBConnection)
+            lock (Server.Server.DBConnection)
             {
-                server.DBConnection.Open();
-                IDbCommand command = server.DBConnection.CreateCommand();
+                Server.Server.DBConnection.Open();
+                IDbCommand command = Server.Server.DBConnection.CreateCommand();
                 command.CommandText = String.Format("INSERT INTO `rest`.`mio991.REST.Plugins.Files` (`ID`, `Name`, `mimeType`) VALUES ('{0}', '{1}', '{2}');", Guid.NewGuid(), name, mime);
                 IDataReader reader = command.ExecuteReader();
                 while (reader.Read())
@@ -57,18 +56,18 @@ namespace mio991.REST.Plugins.Files
                     result = new File(reader);
                 }
                 reader.Close();
-                server.DBConnection.Close();
+                Server.Server.DBConnection.Close();
             }
             return result;
         }
 
-        public static File[] GetFile(Server.Server server, User user)
+        public static File[] GetFile(User user)
         {
             List<File> result = new List<File>();
-            lock (server.DBConnection)
+            lock (Server.Server.DBConnection)
             {
-                server.DBConnection.Open();
-                IDbCommand command = server.DBConnection.CreateCommand();
+                Server.Server.DBConnection.Open();
+                IDbCommand command = Server.Server.DBConnection.CreateCommand();
                 command.CommandText = String.Format("SELECT mio991.REST.Plugins.Files.* FROM mio991.REST.Plugins.Files LEFT JOIN object_user ON mio991.REST.Plugins.Files.id = object_user.object_id WHERE object_user.user_id = '{0}'", user.ID);
                 IDataReader reader = command.ExecuteReader();
                 int i = 0;
@@ -77,7 +76,7 @@ namespace mio991.REST.Plugins.Files
                     result.Add(new File(reader));
                 }
                 reader.Close();
-                server.DBConnection.Close();
+                Server.Server.DBConnection.Close();
             }
             return result.ToArray();
         }
@@ -96,13 +95,13 @@ namespace mio991.REST.Plugins.Files
 
         public void Update(string name, string mime, string picData)
         {
-            lock (m_Server.DBConnection)
+            lock (Server.Server.DBConnection)
             {
-                m_Server.DBConnection.Open();
-                IDbCommand command = m_Server.DBConnection.CreateCommand();
+                Server.Server.DBConnection.Open();
+                IDbCommand command = Server.Server.DBConnection.CreateCommand();
                 command.CommandText = String.Format("INSERT INTO `rest`.`mio991.REST.Plugins.Files` (`ID`, `Name`, `mimeType`) VALUES ('{0}', '{1}', '{2}') ON DUPLICATE KEY UPDATE `Name` = VALUES(`Name`), `mimeType` = VALUES(`mimeType`)", ID, name,mime);
                 command.ExecuteNonQuery();
-                m_Server.DBConnection.Close();
+                Server.Server.DBConnection.Close();
             }
 
             m_Name = name;
@@ -112,15 +111,14 @@ namespace mio991.REST.Plugins.Files
             pic.Write(buffer, 0, buffer.Length);
         }
 
-        public File(string id, Server.Server server, string fileDiretory)
+        public File(string id, string fileDiretory)
             : base("mio991.REST.Plugins.Files", id)
         {
-            m_Server = server;
             m_FileDirectory = fileDiretory;
-            lock (m_Server.DBConnection)
+            lock (Server.Server.DBConnection)
             {
-                m_Server.DBConnection.Open();
-                IDbCommand command = m_Server.DBConnection.CreateCommand();
+                Server.Server.DBConnection.Open();
+                IDbCommand command = Server.Server.DBConnection.CreateCommand();
                 command.CommandText = String.Format("SELECT * FROM files WHERE ID = '{0}'", ID);
                 IDataReader reader = command.ExecuteReader();
                 if (reader.RecordsAffected == 1)
@@ -135,7 +133,7 @@ namespace mio991.REST.Plugins.Files
                     throw new ArgumentException("Resource not found");
                 }
                 reader.Close();
-                m_Server.DBConnection.Close();
+                Server.Server.DBConnection.Close();
             }
         }
     }

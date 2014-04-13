@@ -13,13 +13,12 @@ namespace mio991.REST.Plugins.Files
     {
         FileResource m_Resource;
 
-
-        public FilePlugin(XmlNode settings, Server.Server server)
-            : base(settings, server)
+        public FilePlugin(XmlNode settings)
+            : base(settings)
         {
             if (!Path.IsPathRooted(m_Settings["saveDirectory"]))
             {
-                m_Settings["saveDirectory"] = m_Server.WorkingDirectory + m_Settings["saveDirectory"];
+                m_Settings["saveDirectory"] = Server.Server.WorkingDirectory + m_Settings["saveDirectory"];
             }
 
             if (!Directory.Exists(m_Settings["saveDirectory"]))
@@ -27,9 +26,9 @@ namespace mio991.REST.Plugins.Files
                 Directory.CreateDirectory(m_Settings["saveDirectory"]);
             }
 
-            m_Resource = new FileResource(m_Server, m_Settings["saveDirectory"], (mio991.REST.Plugins.UsersAndRights.UserAndRightsPlugin)m_Server.Plugins[m_Settings["mio991.REST.Plugins.UsersAndRightsPlugin"]]);
+            m_Resource = new FileResource(m_Settings["saveDirectory"], (mio991.REST.Plugins.UsersAndRights.UserAndRightsPlugin)Server.Server.Plugins[m_Settings["mio991.REST.Plugins.UsersAndRightsPlugin"]]);
 
-            m_Server.RootResource.Add("mio991.REST.Plugins.Files", m_Resource);
+            Server.Server.RootResource.Add("mio991.REST.Plugins.Files", m_Resource);
         }
     }
 }

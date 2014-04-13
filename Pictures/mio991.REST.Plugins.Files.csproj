@@ -53,6 +53,6 @@
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
-    <PostBuildEvent>copy .\Pictures.dll ..\..\..\REST_Server\bin\Debug\Pictures.dll</PostBuildEvent>
+    <PostBuildEvent>copy .\mio991.REST.Plugins.Files.dll ..\..\..\REST_Server\bin\Debug\mio991.REST.Plugins.Files.dll</PostBuildEvent>
   </PropertyGroup>
 </Project>

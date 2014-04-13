@@ -8,9 +8,9 @@ namespace mio991.REST.Server
 		{
 			try
 			{
-				Server server = new Server(Environment.CurrentDirectory);
+				Server.Init(Environment.CurrentDirectory);
 
-				server.Start();
+				Server.Start();
 
 				bool runing = true;
 
@@ -22,7 +22,7 @@ namespace mio991.REST.Server
 					case "shutdown":
 					case "exit":
 						runing = false;
-						server.Dispose();
+						Server.Stop();
 						break;
 					}
 				}

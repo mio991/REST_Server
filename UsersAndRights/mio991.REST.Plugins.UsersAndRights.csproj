@@ -57,7 +57,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy .\UsersAndRights.dll ..\..\..\REST_Server\bin\Debug\UsersAndRights.dll</PostBuildEvent>
+    <PostBuildEvent>copy .\mio991.REST.Plugins.UsersAndRights.dll ..\..\..\REST_Server\bin\Debug\mio991.REST.Plugins.UsersAndRights.dll</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
