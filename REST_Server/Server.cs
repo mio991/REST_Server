@@ -175,11 +175,7 @@ namespace mio991.REST.Server
 
         private class PluginLoader
         {
-            string m_Assembly;
-            XmlNode m_Settings;
-            Assembly m_PluginAssembly;
-            string m_Name;
-
+            #region static
             static List<Assembly> m_LoadedAssemblys = new List<Assembly>();
 
             static PluginLoader()
@@ -191,6 +187,13 @@ namespace mio991.REST.Server
             {
                 m_LoadedAssemblys.Add(args.LoadedAssembly);
             }
+
+            #endregion
+
+            string m_Assembly;
+            XmlNode m_Settings;
+            Assembly m_PluginAssembly;
+            string m_Name;
 
             public PluginLoader(XmlNode plugin)
             {
@@ -206,24 +209,21 @@ namespace mio991.REST.Server
                             m_Settings = node;
                             break;
                     }
-
-                    m_Name = plugin.Attributes["name"].Value;
                 }
+                m_Name = plugin.Attributes["name"].Value;
             }
 
             public void Load()
             {
-                bool isLoaded = false;
-
                 foreach (Assembly test in m_LoadedAssemblys)
                 {
                     if (test.Location == m_Assembly)
                     {
-                        isLoaded = true;
+                        m_PluginAssembly = test;
                     }
                 }
 
-                if (!isLoaded)
+                if (m_PluginAssembly == null)
                 {
                     m_PluginAssembly = Assembly.LoadFile(m_Assembly);
                     Server.Log.Info(String.Format("Load Assembly '{0}'", m_Assembly));
