@@ -28,7 +28,7 @@
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <PropertyGroup>
-    <RunPostBuildEvent>Always</RunPostBuildEvent>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -43,16 +43,17 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\REST_Server\mio991.REST.Server.csproj">
+    <ProjectReference Include="..\mio991.REST.Server\mio991.REST.Server.csproj">
       <Project>{36BEA6DA-0E69-4FD3-B9D5-03431C805D61}</Project>
       <Name>mio991.REST.Server</Name>
     </ProjectReference>
-    <ProjectReference Include="..\UsersAndRights\mio991.REST.Plugins.UsersAndRights.csproj">
+    <ProjectReference Include="..\mio991.REST.Plugins.UserAndRights\mio991.REST.Plugins.UsersAndRights.csproj">
       <Project>{3c1cbd4e-1bee-4237-a0b9-992f74784a68}</Project>
       <Name>mio991.REST.Plugins.UsersAndRights</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
-    <PostBuildEvent>copy .\mio991.REST.Plugins.Files.dll ..\..\..\REST_Server\bin\Debug\mio991.REST.Plugins.Files.dll</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>

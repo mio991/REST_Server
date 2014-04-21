@@ -50,14 +50,15 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\REST_Server\mio991.REST.Server.csproj">
+    <ProjectReference Include="..\mio991.REST.Server\mio991.REST.Server.csproj">
       <Project>{36bea6da-0e69-4fd3-b9d5-03431c805d61}</Project>
       <Name>mio991.REST.Server</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy .\mio991.REST.Plugins.UsersAndRights.dll ..\..\..\REST_Server\bin\Debug\mio991.REST.Plugins.UsersAndRights.dll</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

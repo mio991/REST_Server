@@ -19,6 +19,8 @@ namespace mio991.REST.Server.Plugins
 			}
 		}
 
+        //public abstract void Init
+
 		public virtual void Dispose()
 		{
 

@@ -56,7 +56,13 @@ namespace mio991.REST.Server
             {
                 Server.Log.Error(ex);
             }
+            if (DoneRequestHandling != null)
+            {
+                DoneRequestHandling(this, new EventArgs());
+            }
         }
+
+        public event EventHandler DoneRequestHandling;
 
         public void HandleRequest(HttpListenerContext context)
         {

@@ -70,7 +70,6 @@ namespace mio991.REST.Plugins.Files
                 IDbCommand command = Server.Server.DBConnection.CreateCommand();
                 command.CommandText = String.Format("SELECT mio991.REST.Plugins.Files.* FROM mio991.REST.Plugins.Files LEFT JOIN object_user ON mio991.REST.Plugins.Files.id = object_user.object_id WHERE object_user.user_id = '{0}'", user.ID);
                 IDataReader reader = command.ExecuteReader();
-                int i = 0;
                 while (reader.Read())
                 {
                     result.Add(new File(reader));

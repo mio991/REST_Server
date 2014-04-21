@@ -24,9 +24,13 @@ namespace mio991.REST.Server
         /// <summary>
         /// DataBase-Connection
         /// </summary>
-        private static IDbConnection m_DBConnection;
+        private static Dictionary<Thread, IDbConnection> m_DBConnections = new Dictionary<Thread,IDbConnection>();
 
-        private static Dictionary<string, Dictionary<string, object>> m_SessionsVariables;
+        private static string m_ConnectionString;
+
+        private static Dictionary<string, Dictionary<string, object>> m_SessionsVariabless;
+
+        private static Type m_DBConnectionType, ConnectionString;
 
         /// <summary>
         /// Loging Entrypoint
@@ -142,6 +146,7 @@ namespace mio991.REST.Server
             }
         }
 
+        /*
         /// <summary>
         /// Initialise one Plugin with the plugin-node.
         /// </summary>
@@ -172,23 +177,10 @@ namespace mio991.REST.Server
             PluginInitTypeAttribute initType = (PluginInitTypeAttribute)assembly.GetCustomAttributes(typeof(PluginInitTypeAttribute), true)[0];
             m_Plugins.Add(plugin.Attributes["name"].Value, (PluginBase)Activator.CreateInstance(initType.InitType, settings));
         }
+         */
 
         private class PluginLoader
         {
-            #region static
-            static List<Assembly> m_LoadedAssemblys = new List<Assembly>();
-
-            static PluginLoader()
-            {
-                AppDomain.CurrentDomain.AssemblyLoad += CurrentDomain_AssemblyLoad;
-            }
-
-            static void CurrentDomain_AssemblyLoad(object sender, AssemblyLoadEventArgs args)
-            {
-                m_LoadedAssemblys.Add(args.LoadedAssembly);
-            }
-
-            #endregion
 
             string m_Assembly;
             XmlNode m_Settings;
@@ -215,7 +207,7 @@ namespace mio991.REST.Server
 
             public void Load()
             {
-                foreach (Assembly test in m_LoadedAssemblys)
+                foreach (Assembly test in AppDomain.CurrentDomain.GetAssemblies())
                 {
                     if (test.Location == m_Assembly)
                     {
@@ -307,20 +299,21 @@ namespace mio991.REST.Server
 
             Log.Info(String.Format("Load Connector-Assembly: {0}", path));
             Assembly assembly = Assembly.LoadFrom(path);
-            
-            Log.Info(String.Format("Create Connector-Instance: {0}", type));
-            m_DBConnection = assembly.CreateInstance(type) as IDbConnection;
 
-            m_DBConnection.ConnectionString = connectionString;
+            m_DBConnectionType = assembly.GetType(type);
 
-            Log.Info(String.Format("Test DB-Connection: {0}", m_DBConnection.Database));
+            IDbConnection db = Activator.CreateInstance(m_DBConnectionType) as IDbConnection;
+
+            db.ConnectionString = connectionString;
+
+            Log.Info(String.Format("Test DB-Connection: {0}", db.Database));
 
             try
             {
 
-                m_DBConnection.Open();
+                db.Open();
 
-                m_DBConnection.Close();
+                db.Close();
 
             }
             catch (DbException ex)
@@ -333,7 +326,13 @@ namespace mio991.REST.Server
         {
             get
             {
-                return m_DBConnection;
+                if (m_DBConnections.ContainsKey(Thread.CurrentThread))
+                {
+                    m_DBConnections.Add(Thread.CurrentThread, Activator.CreateInstance(m_DBConnectionType) as IDbConnection);
+                    m_DBConnections[Thread.CurrentThread].ConnectionString = m_ConnectionString;
+
+                }
+                return m_DBConnections[Thread.CurrentThread];
             }
         }
 
@@ -357,6 +356,7 @@ namespace mio991.REST.Server
 
                 m_CallBack = new AsyncCallback(ListenerCallBack);
                 m_Handler = new RequestHandler(new UnicodeEncoding());
+                m_Handler.DoneRequestHandling += m_Handler_DoneRequestHandling;
                 m_RootResource = new CollectingResource("root");
 
                 if (!File.Exists(serverConfig))
@@ -373,12 +373,20 @@ namespace mio991.REST.Server
 
                 InitPlugins(doc.GetElementsByTagName("plugins")[0]);
 
-                m_SessionsVariables = new Dictionary<string, Dictionary<string, object>>();
+                m_SessionsVariabless = new Dictionary<string, Dictionary<string, object>>();
 
             }
             catch (Exception ex)
             {
                 Log.Fatal("During the Initiation is an Error ocured", ex);
+            }
+        }
+
+        static void m_Handler_DoneRequestHandling(object sender, EventArgs e)
+        {
+            if (m_DBConnections.ContainsKey(Thread.CurrentThread))
+            {
+                m_DBConnections.Remove(Thread.CurrentThread);
             }
         }
 
@@ -389,13 +397,13 @@ namespace mio991.REST.Server
             {
                 sessionid = new Cookie("sessionid", Guid.NewGuid().ToString());
                 context.Request.Cookies.Add(sessionid);
-                m_SessionsVariables.Add(sessionid.Value, new Dictionary<string, object>());
+                m_SessionsVariabless.Add(sessionid.Value, new Dictionary<string, object>());
                 if (SessionGenerated != null)
                 {
-                    SessionGenerated(null, new SessionGenaretedEventArgs(m_SessionsVariables[sessionid.Value]));
+                    SessionGenerated(null, new SessionGenaretedEventArgs(m_SessionsVariabless[sessionid.Value]));
                 }
             }
-            return m_SessionsVariables[sessionid.Value];
+            return m_SessionsVariabless[sessionid.Value];
         }
 
         public static event EventHandler<SessionGenaretedEventArgs> SessionGenerated;
@@ -429,6 +437,7 @@ namespace mio991.REST.Server
             {
                 HttpListenerContext context = m_Listener.EndGetContext(result);
                 m_Handler.HandleRequest(context);
+
                 m_Listener.BeginGetContext(m_CallBack, null);
             }
             catch (ObjectDisposedException)
